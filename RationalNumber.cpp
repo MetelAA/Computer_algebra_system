@@ -56,3 +56,16 @@ void RationalNumber::reduce() {
     this->numerator = new IntegerNumber(reducedNumerator);
     this->denominator = new NaturalNumber(reducedDenominator);
 }
+
+bool RationalNumber::isInteger() {
+    NaturalNumber denominator = *this->denominator;
+    const std::__1::vector<uint8_t> &denomDigits = denominator.getNumbers();
+
+    if (denomDigits.size() == 1) {
+        if (denomDigits[0] == 1) {
+            return true;
+        }
+    }
+
+    return false;
+}
