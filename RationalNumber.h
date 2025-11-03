@@ -52,6 +52,14 @@ public:
     std::string toString();
     const IntegerNumber& getIntegerNumerator() noexcept;
     const NaturalNumber& getNaturalDenominator() noexcept;
+    void reduce();
+    bool isInteger();
+    RationalNumber fromInteger(const IntegerNumber& other);
+    IntegerNumber toInteger(const RationalNumber& other);
+    RationalNumber add(const RationalNumber& other);
+    RationalNumber subtract(const RationalNumber& other);
+    RationalNumber multiply(const RationalNumber& other);
+    RationalNumber division(const RationalNumber& other);
 
 private:
     IntegerNumber* numerator; //числитель

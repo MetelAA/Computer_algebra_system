@@ -45,6 +45,16 @@
         bool isNegative() noexcept;
         std::string toString();
         const std::vector<uint8_t>& getNumbers() noexcept;
+        NaturalNumber abs();
+        uint8_t getSign();
+        IntegerNumber negate();
+        IntegerNumber toInteger(const NaturalNumber& other);
+        NaturalNumber toNatural(const IntegerNumber& other);
+        IntegerNumber add(const NaturalNumber& other);
+        IntegerNumber subtract(const NaturalNumber& other);
+        IntegerNumber multiply(const NaturalNumber& other);
+        IntegerNumber quotient(const NaturalNumber& other);
+        IntegerNumber remainder(const NaturalNumber& other);
 
 
     private:
