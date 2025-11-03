@@ -34,4 +34,25 @@ RationalNumber::RationalNumber(const std::string &s) {
     this->denominator = new NaturalNumber(denominatorS);
 }
 
+void RationalNumber::reduce() {
+    NaturalNumber numeratorAbs = this->numerator->abs();
+    NaturalNumber gcd = numeratorAbs.GCD(*this->denominator);
 
+    const std::vector<uint8_t> &gcdDigits = gcd.getNumbers();
+    size_t digitsCount = gcdDigits.size();
+    if (digitsCount == 1) {
+        if (gcdDigits[0] == 1) {
+            return;
+        }
+    }
+
+    IntegerNumber reducedNumerator = this->numerator->quotient(gcd);
+    NaturalNumber denominator = *this->denominator;
+    NaturalNumber reducedDenominator = denominator.quotient(gcd);
+    
+    delete this->numerator;
+    delete this->denominator;
+
+    this->numerator = new IntegerNumber(reducedNumerator);
+    this->denominator = new NaturalNumber(reducedDenominator);
+}
