@@ -15,9 +15,9 @@ public:
         long long numerator, denominator;
     };
 
+    explicit Polynomial(const std::vector<RationalNumber> &coefficients) : coefficients(coefficients) {}
 
-    Polynomial() {}
-    Polynomial(const std::vector<std::string>& coefficientsA); //сюда попадает строка в прямом поряде, т.е. если было x^3+2/5x^3+3x^3+4 то сюда должно прийти {1,2/5,3,4}
+    Polynomial(const std::vector<std::string>& coefficientsA); //сюда попадает строка в прямом поряде, т.е. если было x^3+2/5x^3+3x^3+4 то сюда должно прийти {1/1,2/5,3/1,4/1}
     Polynomial(const std::vector<rationalSupport>& coefficientsA); //ограничения на numerator и denominator как в обычных rational. Числа также в прямом порядке
     // например чтобы передать 3/4x^2 - 2x + 2/5 нужно передать { {3, 4}, {-2, 1}, {2, 5} }
 
