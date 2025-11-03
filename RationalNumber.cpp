@@ -69,3 +69,9 @@ bool RationalNumber::isInteger() {
 
     return false;
 }
+
+RationalNumber RationalNumber::fromInteger(const IntegerNumber &other) {
+    NaturalNumber denominator(1);
+
+    return RationalNumber(other, denominator);
+}
