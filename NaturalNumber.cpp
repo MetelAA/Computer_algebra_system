@@ -58,17 +58,18 @@ NaturalNumber NaturalNumber::quotient(const NaturalNumber &other) const {
         return NaturalNumber(std::vector<uint8_t>{0});
     }
 
-    NaturalNumber dividend(*this);
+    NaturalNumber dividend(*this); // будем работать с копиями
     const NaturalNumber& divisor(other);
     uint32_t quotient = 0;
 
-    while (dividend.cmp(&divisor) == 2 || dividend.cmp(&divisor) == 0) {
-        dividend = dividend.subtract(divisor);
+    while (dividend.cmp(&divisor) % 2 == 0) {
+        dividend = dividend.subtract(divisor); // будем вычитать делитель, пока можно
         quotient++;
-    } // O(n*k) +-
+    } // O(n * k), постараюсь ускорить, пока так
+
 
     std::vector<uint8_t> quotient_result;
-
+// так как quotient >= 1 => log10 работает исправно
     quotient_result.reserve(static_cast<size_t>(std::log10(quotient) + 1));
 
     while (quotient > 0) {
@@ -102,7 +103,7 @@ NaturalNumber NaturalNumber::GCD(const NaturalNumber &other) const {
     if (second_value.isEqualZero()) {
         throw UniversalStringException("can not divide by zero");
     }
-
+// алгоритм Евклида
     while (!second_value.isEqualZero()) {
         if (first_value.cmp(&second_value) == 1) {
             std::swap(first_value, second_value);
@@ -121,6 +122,6 @@ NaturalNumber NaturalNumber::LCM(const NaturalNumber &other) const {
     if (first_value.isEqualZero() || second_value.isEqualZero()) {
         throw UniversalStringException("can not divide by zero");
     }
-
+// НОК = a * b / НОД(a, b)
     return (first_value.multiply(second_value)).quotient(first_value.GCD(second_value));
 }
