@@ -51,7 +51,8 @@
         static IntegerNumber toInteger(const NaturalNumber& other);
         NaturalNumber toNatural(const IntegerNumber& other) const;
         IntegerNumber add(const IntegerNumber& other) const;
-        IntegerNumber subtract(const IntegerNumber& other) const;
+
+        std::vector<uint8_t> subtract(const IntegerNumber &other) const;
         IntegerNumber multiply(const IntegerNumber& other) const;
         IntegerNumber quotient(const IntegerNumber& other) const;
         IntegerNumber remainder(const IntegerNumber& other) const;

@@ -7,6 +7,8 @@
 #include <cmath>
 #include <filesystem>
 
+#include "IntegerNumber.h"
+
 
 std::string NaturalNumber::toString() noexcept {
     if (this->numbers.empty())
@@ -69,7 +71,7 @@ NaturalNumber NaturalNumber::quotient(const NaturalNumber &other) const {
 
 
     std::vector<uint8_t> quotient_result;
-// так как quotient >= 1 => log10 работает исправно
+    // так как quotient >= 1 => log10 работает исправно
     quotient_result.reserve(static_cast<size_t>(std::log10(quotient) + 1));
 
     while (quotient > 0) {
@@ -93,7 +95,7 @@ NaturalNumber NaturalNumber::remainder(const NaturalNumber &other) const {
     const NaturalNumber quotient = dividend.quotient(divisor);
     const NaturalNumber product = divisor.multiply(quotient);
 
-    return dividend.cmp(&product) % 2 == 0 ? dividend.subtract(product) : dividend;
+    return dividend.subtract(product);
 }
 
 NaturalNumber NaturalNumber::GCD(const NaturalNumber &other) const {
