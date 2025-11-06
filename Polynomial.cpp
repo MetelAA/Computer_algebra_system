@@ -11,7 +11,7 @@ const std::vector<RationalNumber>& Polynomial::getCoefficients() noexcept {
     return this->coefficients;
 }
 
-std::string Polynomial::toString() {
+std::string Polynomial::toString() const{
     if (this->coefficients.empty())
         throw UniversalStringException("atypical behavior, the vector of coefficients should not be empty");
     std::string result;
