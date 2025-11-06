@@ -54,4 +54,6 @@ IntegerNumber IntegerNumber::multiply(const IntegerNumber &other) const {
     return IntegerNumber(multiplyAbs.getNumbers(), resultIsNegative);
 };
 
-
+bool NaturalNumber::isEqualZero() {
+    return numbers.size() == 1 && numbers[0] == 0;
+}
