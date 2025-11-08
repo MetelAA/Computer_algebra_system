@@ -162,5 +162,6 @@ std::vector<RationalNumber>  Validator::validatePolynomial(std::string &number) 
         throw UniversalStringException("Validator::validatePolynomial(): all coefficients are zero!");
     }
 
+
     return result;
 }
