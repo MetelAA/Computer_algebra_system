@@ -14,6 +14,15 @@ Polynomial::Polynomial remainder(const Polynomial& other) const {
 // P-11 НОД полиномов
 // Касимова Варвара 4385
 Polynomial::Polynomial GCD(const Polynomial& other) const {
+    // Так как 0 делитя на все, что угодно, мы не можем точно определить НОД
+    // Возвращаем константу, так как метод обязан что-то вернуть
+    if(remainder->coefficients.size() == 1 && 
+            remainder->coefficients[0].numerator->getSign() == 0){
+        throw UniversalStringException("wrong argument 0, it is impossible to determine the GCD unambiguously");
+        return Polynomial({RationalNumber(IntegerNumber({1}, false), NaturalNumber{1})});
+    }
+
+    // Если среди переданных значений все корректные
     // Инициализируем 2 полинома для применения к ним алгоритма Евклида
     Polynomial* polynom1 = new Polynomial(*this);
     Polynomial* polynom2 = new Polynomial(other);
@@ -58,8 +67,15 @@ Polynomial::Polynomial GCD(const Polynomial& other) const {
 // P-12 Производная полинома
 // Касимова Варвара 4385
 Polynomial::Polynomial derivative() const {
-    // Создаем новый элемент дляхранения производной
-    Polynomial* derivative = new Polynomial(*this);
+    // Проверим степень полинома
+    // Если степень 0, значит, полином представляет обой константу, 
+    // следоватеьно, производная равна 0, особый случай, обрабатываетя отдельно
+    if(this->getDegree() == 0){
+        return Polynomial({RationalNumber(IntegerNumber({0}, false), NaturalNumber{1})});
+    }
+
+    // Иначе создаем новый объект для хранения производной
+    Polynomial* derivative_ptr = new Polynomial(*this);
     // Начиная с 1 степени переменной, перебираем все коэффициенты
     for(size_t i = 1; i < this->coefficients.size(); i++){
         // Переводим показатель степени в дробное представление 
@@ -68,11 +84,12 @@ Polynomial::Polynomial derivative() const {
         // Так как при дифференцировании степень переменной понижается,
         // результат умножения коэффициента на показатель степени записываем 
         // в ячейку, соответствующую меньшей степени переменной
-        derivative.coefficients[i - 1] = this->coefficients[i].multiply(power);
+        derivative_ptr->coefficients[i - 1] = this->coefficients[i].multiply(power);
     }
-    // так как копировали исходный полином, а степень производной на 1 меньше,
+    // Так как копировали исходный полином, а степень производной на 1 меньше,
     // последняя ячейка, которая соответствует старшему коэффициенту, больше не нужна
-    derivative->pop_back();
+    derivative_ptr->pop_back();
+    Polynomial derivative = Polynomial(*derivative_ptr);
     return derivative;
 };
 
