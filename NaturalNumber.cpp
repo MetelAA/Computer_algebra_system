@@ -6,7 +6,7 @@
 #include "Exceptions/UniversalStringException.h"
 #include <cmath>
 
-std::string NaturalNumber::toString() noexcept {
+std::string NaturalNumber::toString() const {
     if (this->numbers.empty())
         throw UniversalStringException("atypical behavior, the vector of numbers should not be empty");
     std::string result(this->numbers.size(), '0');
