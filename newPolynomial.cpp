@@ -16,8 +16,8 @@ Polynomial Polynomial::remainder(const Polynomial& other) const {
 Polynomial Polynomial::GCD(const Polynomial& other) const {
     // Так как 0 делитя на все, что угодно, мы не можем точно определить НОД
     // Возвращаем константу, так как на нее делится все, но в ней нет корней
-    if(this->coefficients.size() == 1 && this->coefficients[0].numerator->getSign() == 0 ||
-            other.coefficients.size() == 1 && other.coefficients[0].numerator->getSign() == 0){
+    if(this->getDegree() == 1 && this->coefficients[0].getIntegerNumerator().getSign() == 0 ||
+            other.getDegree() == 1 && other.coefficients[0].getIntegerNumerator().getSign() == 0){
         throw UniversalStringException("Polynomial::GCD: wrong argument, one of the polynomials is equivalent to 0, it is impossible to uniquely determine the GCD");
         return Polynomial({RationalNumber(IntegerNumber({1}, false), NaturalNumber{1})});
     }
@@ -31,14 +31,14 @@ Polynomial Polynomial::GCD(const Polynomial& other) const {
 
     // Пока остаток не станет равен 0, то есть пока количетво коэффициентов больше 1
     // Или пока единственный коэффициент не 0, применяем алгоритм Евклида
-    while(!(remainder->coefficients.size() == 1 && 
-            remainder->coefficients[0].numerator->getSign() == 0)){
+    while(!(remainder->getDegree() == 1 && 
+            remainder->coefficients[0].getIntegerNumerator().getSign() == 0)){
         // Очищаем память от первого полинома, его мы уже обработали
         delete polynom1;
         // Новыми данными для применения алгоритма становятся 
         // второй полином и остаток от деления первого на второй
         polynom1 = polynom2;
-        polynom2 = remainder_ptr;
+        polynom2 = remainder;
         // Вычисляем новый остаток
         remainder = new Polynomial(polynom1->remainder(*polynom2));
     }
@@ -78,7 +78,8 @@ Polynomial Polynomial::derivative() const {
     Polynomial derivative = Polynomial(*this);
     // Начиная с 1 степени переменной, перебираем все коэффициенты
     for(size_t i = 1; i < this->coefficients.size(); i++){
-        // Переводим показатель степени в дробное представление 
+        // Переводим показатель степени в дробное представление, 
+        // чтобы перемножить с дробным коэффциентом с помощью метода дроби
         std::string str = std::to_string(i) + "/1";
         RationalNumber power = RationalNumber(str);
         // Так как при дифференцировании степень переменной понижается,
@@ -88,7 +89,7 @@ Polynomial Polynomial::derivative() const {
     }
     // Так как копировали исходный полином, а степень производной на 1 меньше,
     // последняя ячейка, которая соответствует старшему коэффициенту, больше не нужна
-    derivative.pop_back();
+    derivative.coefficients.pop_back();
     return derivative;
 };
 
