@@ -2,7 +2,7 @@
 
 // P-10 Остаток от деления полиномов
 // Касимова Варвара 4385
-Polynomial::Polynomial remainder(const Polynomial& other) const {
+Polynomial Polynomial::remainder(const Polynomial& other) const {
     // Находим неполное частное от деления
     Polynomial incomplete_quotient = this->quotient(other);
     // Умножаем неполное частное на делитель
@@ -13,12 +13,12 @@ Polynomial::Polynomial remainder(const Polynomial& other) const {
 
 // P-11 НОД полиномов
 // Касимова Варвара 4385
-Polynomial::Polynomial GCD(const Polynomial& other) const {
+Polynomial Polynomial::GCD(const Polynomial& other) const {
     // Так как 0 делитя на все, что угодно, мы не можем точно определить НОД
-    // Возвращаем константу, так как метод обязан что-то вернуть
+    // Возвращаем константу, так как на нее делится все, но в ней нет корней
     if(this->coefficients.size() == 1 && this->coefficients[0].numerator->getSign() == 0 ||
             other.coefficients.size() == 1 && other.coefficients[0].numerator->getSign() == 0){
-        throw UniversalStringException("wrong argument 0, it is impossible to determine the GCD unambiguously");
+        throw UniversalStringException("Polynomial::GCD: wrong argument, one of the polynomials is equivalent to 0, it is impossible to uniquely determine the GCD");
         return Polynomial({RationalNumber(IntegerNumber({1}, false), NaturalNumber{1})});
     }
 
@@ -66,7 +66,7 @@ Polynomial::Polynomial GCD(const Polynomial& other) const {
 
 // P-12 Производная полинома
 // Касимова Варвара 4385
-Polynomial::Polynomial derivative() const {
+Polynomial Polynomial::derivative() const {
     // Проверим степень полинома
     // Если степень 0, значит, полином представляет обой константу, 
     // следоватеьно, производная равна 0, особый случай, обрабатываетя отдельно
@@ -95,11 +95,11 @@ Polynomial::Polynomial derivative() const {
 
 // P-13 Многочлен с корнями 1 кратности
 // Касимова Варвара 4385
-Polynomial::Polynomial makeSquareFree() const {
+Polynomial Polynomial::makeSquareFree() const {
     // Найдем производную полинома
     Polynomial derivative = this->derivative();
     // НОД полином и его производной будет содеражть все кратные корни
-    Polynomial gcd = GCD(derivative);
+    Polynomial gcd = this->GCD(derivative);
     // Поделим на НОД, чтобы остались только корни кратности 1
     return derivative.remainder(gcd);
 };
