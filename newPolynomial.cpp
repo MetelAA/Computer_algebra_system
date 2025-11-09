@@ -16,8 +16,8 @@ Polynomial::Polynomial remainder(const Polynomial& other) const {
 Polynomial::Polynomial GCD(const Polynomial& other) const {
     // Так как 0 делитя на все, что угодно, мы не можем точно определить НОД
     // Возвращаем константу, так как метод обязан что-то вернуть
-    if(remainder->coefficients.size() == 1 && 
-            remainder->coefficients[0].numerator->getSign() == 0){
+    if(this->coefficients.size() == 1 && this->coefficients[0].numerator->getSign() == 0 ||
+            other.coefficients.size() == 1 && other.coefficients[0].numerator->getSign() == 0){
         throw UniversalStringException("wrong argument 0, it is impossible to determine the GCD unambiguously");
         return Polynomial({RationalNumber(IntegerNumber({1}, false), NaturalNumber{1})});
     }
