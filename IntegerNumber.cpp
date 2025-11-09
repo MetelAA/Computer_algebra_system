@@ -74,7 +74,7 @@ IntegerNumber IntegerNumber::toInteger(const NaturalNumber& other) {
 }
 
 NaturalNumber IntegerNumber::toNatural(const IntegerNumber& other) {
-    if (other.isNegativeFlag && !other.number->isEqualZero()) {
+    if (other.isNegativeFlag) {
         throw UniversalStringException("to convert an integer to a natural, it must be greater than or equal to 0.");
     }
     return NaturalNumber(*other.number); 
