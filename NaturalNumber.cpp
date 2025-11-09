@@ -131,3 +131,7 @@ NaturalNumber NaturalNumber::LCM(const NaturalNumber &other) const {
     // НОК = a * b / НОД(a, b)
     return (first_value.multiply(second_value)).quotient(first_value.GCD(second_value));
 }
+
+bool NaturalNumber::isEqualZero() {
+    return numbers.size() == 1 && numbers[0] == 0;
+}
