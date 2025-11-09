@@ -21,6 +21,9 @@ const std::vector<uint8_t> &NaturalNumber::getNumbers() const noexcept {
 }
 
 NaturalNumber::NaturalNumber(unsigned long long int a) {
+    if (a == 0) {
+        this->numbers.push_back(0);
+    }
     while (a > 0) {
         this->numbers.push_back(a % 10);
         a /= 10;
@@ -45,6 +48,10 @@ NaturalNumber::NaturalNumber(const std::vector<uint8_t> &CpNumbers) {
     if (CpNumbers.empty())
         throw UniversalStringException("wrong argument, the vector of numbers should not be empty");
     this->numbers = CpNumbers;
+
+    while (this->numbers.size() > 1 && this->numbers.back() == 0) {
+        this->numbers.pop_back();
+    }
 }
 
 
@@ -105,16 +112,20 @@ NaturalNumber NaturalNumber::GCD(const NaturalNumber &other) const {
         throw UniversalStringException("the gcd for two zeros is not uniquely defined");
     }
 
-    if (!second_value.isNotEqualZero()) {
-        throw UniversalStringException("can not divide by zero");
+    if (!this->isNotEqualZero()) {
+        return second_value;
     }
+
+    if (!second_value.isNotEqualZero()) {
+        return first_value;
+    }
+    // 42 1
     // алгоритм Евклида
     while (second_value.isNotEqualZero()) {
-        if (first_value.cmp(&second_value) == 1) {
-            std::swap(first_value, second_value);
-        }
-
-        first_value = first_value.remainder(second_value);
+        // 42.remainder(1)
+        NaturalNumber tmp = first_value.remainder(second_value);
+        first_value = second_value;
+        second_value = tmp;
     }
 
     return first_value;
