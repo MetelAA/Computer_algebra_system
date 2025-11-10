@@ -102,3 +102,46 @@ IntegerNumber RationalNumber::toInteger(const RationalNumber &other) const {
     // про него забываем, нас волнует только числитель.
     return IntegerNumber(*this->numerator);
 }
+
+RationalNumber RationalNumber::add(const RationalNumber &other) const {
+    NaturalNumber numeratorThis = this->getIntegerNumerator().abs();
+    const NaturalNumber denominatorThis = this->getNaturalDenominator();
+    NaturalNumber numeratorOther = other.getIntegerNumerator().abs();
+    const NaturalNumber& denominatorOther = other.getNaturalDenominator();
+
+    const NaturalNumber commonDenominator = denominatorThis.LCM(denominatorOther);
+
+    const NaturalNumber factorThis = commonDenominator.quotient(denominatorThis);
+    const NaturalNumber factorOther = commonDenominator.quotient(denominatorOther);
+
+    numeratorThis = numeratorThis.multiply(factorThis);
+    numeratorOther = numeratorOther.multiply(factorOther);
+    
+    const IntegerNumber sumOfNumerators = IntegerNumber(numeratorThis.getNumbers(),
+        this->getIntegerNumerator().getSign()).add(IntegerNumber(numeratorOther.getNumbers(),
+            other.getIntegerNumerator().getSign()));
+
+    return RationalNumber(sumOfNumerators, commonDenominator);
+}
+
+RationalNumber RationalNumber::subtract(const RationalNumber &other) const {
+    NaturalNumber numeratorThis = this->getIntegerNumerator().abs();
+    const NaturalNumber denominatorThis = this->getNaturalDenominator();
+    NaturalNumber numeratorOther = other.getIntegerNumerator().abs();
+    const NaturalNumber& denominatorOther = other.getNaturalDenominator();
+
+    const NaturalNumber commonDenominator = denominatorThis.LCM(denominatorOther);
+
+    const NaturalNumber factorThis = commonDenominator.quotient(denominatorThis);
+    const NaturalNumber factorOther = commonDenominator.quotient(denominatorOther);
+
+    numeratorThis = numeratorThis.multiply(factorThis);
+    numeratorOther = numeratorOther.multiply(factorOther);
+
+    const IntegerNumber diffOfNumerator = IntegerNumber(numeratorThis.getNumbers(),
+        this->getIntegerNumerator().getSign())
+        .subtract(IntegerNumber(numeratorOther.getNumbers(),
+            other.getIntegerNumerator().getSign()));
+
+    return RationalNumber(diffOfNumerator, commonDenominator);
+}
