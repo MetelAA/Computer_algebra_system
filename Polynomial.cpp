@@ -66,8 +66,8 @@ Polynomial Polynomial::multiply(const Polynomial &other) const
     std::vector<RationalNumber> multiplicandCoefficentVector = coefficients; //векторы коэффициентов
     std::vector<RationalNumber> multiplierCoefficentVector = other.coefficients;
     RationalNumber zero (std::string("0/1"));
-    if(multiplicandCoefficentVector.back().getIntegerNumerator().abs().isEqualZero() || //в случае умножения на 0, получаем 0 сразу
-    multiplierCoefficentVector.back().getIntegerNumerator().abs().isEqualZero()){ 
+    if(!multiplicandCoefficentVector.back().getIntegerNumerator().abs().isNotEqualZero() || //в случае умножения на 0, получаем 0 сразу
+    !multiplierCoefficentVector.back().getIntegerNumerator().abs().isNotEqualZero()){ 
         return Polynomial({zero});
     }
 
@@ -121,7 +121,7 @@ Polynomial Polynomial::quotient(const Polynomial &other) const
     std::vector<RationalNumber> divisorCoefficientVector = other.coefficients; //делителя
 
     RationalNumber zero = RationalNumber(std::string("0/1"));
-    if(divisorCoefficientVector.back().getIntegerNumerator().abs().isEqualZero()){  //проверка на деление на 0
+    if(!divisorCoefficientVector.back().getIntegerNumerator().abs().isNotEqualZero()){  //проверка на деление на 0
         throw UniversalStringException("you cannot divide by zero");
     }
     size_t divisorCoefficientVectorSize = divisorCoefficientVector.size();
