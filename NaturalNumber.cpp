@@ -49,6 +49,7 @@ NaturalNumber::NaturalNumber(const std::vector<uint8_t> &CpNumbers) {
         throw UniversalStringException("wrong argument, the vector of numbers should not be empty");
     this->numbers = CpNumbers;
 
+    //проверка лишняя, тк из условия корректности числа такого быть не должно, но во избежание багов от некоторых участиников проекта пусть будет
     while (this->numbers.size() > 1 && this->numbers.back() == 0) {
         this->numbers.pop_back();
     }
@@ -122,7 +123,6 @@ NaturalNumber NaturalNumber::GCD(const NaturalNumber &other) const {
     // 42 1
     // алгоритм Евклида
     while (second_value.isNotEqualZero()) {
-        // 42.remainder(1)
         NaturalNumber tmp = first_value.remainder(second_value);
         first_value = second_value;
         second_value = tmp;
