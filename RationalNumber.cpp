@@ -117,14 +117,14 @@ RationalNumber RationalNumber::multiply(const RationalNumber& other) const {
 //Q-8 Деление рациональных чисел
 RationalNumber RationalNumber::division(const RationalNumber& other) const {
     //Проверка на делитель равный 0
-    if (other.getIntegerNumerator().getSign() || !(other.getNaturalDenominator().isNotEqualZero())) {
+    if (!other.getIntegerNumerator().getSign()) {
         throw UniversalStringException("you can't divide by zero");
     }
 
     //Получаем знак результата
-    bool ressign = this->numerator->isNegative() ^ other.getIntegerNumerator().isNegative();
+    bool ressign = other.getIntegerNumerator().isNegative();
     //Создаём удобные для дальнейших вычислений объекты
-    IntegerNumber firstmul(other.getIntegerNumerator().getNumbers(), ressign);
+    IntegerNumber firstmul(other.getNaturalDenominator().getNumbers(), ressign);
     NaturalNumber secondmul(other.getIntegerNumerator().getNumbers());
     //Так как деление это умножение на обратную дробь, применяем методы умножения
     IntegerNumber intres(this->numerator->multiply(firstmul));
