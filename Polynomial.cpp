@@ -49,3 +49,59 @@ Polynomial::Polynomial(const std::vector<rationalSupport> &coefficientsA) {
     }
 }
 
+Polynomial Polynomial::add(const Polynomial& other) const {
+    const std::vector<RationalNumber>& longer  = (this->coefficients.size() >= other.coefficients.size())
+        ? this->coefficients
+        : other.coefficients;
+    const std::vector<RationalNumber>& shorter = (this->coefficients.size() >= other.coefficients.size())
+        ? other.coefficients
+        : this->coefficients;
+
+    std::vector<RationalNumber> resultCoeffs;
+    resultCoeffs.reserve(longer.size());
+
+    std::size_t diff = longer.size() - shorter.size();
+
+    for (std::size_t i = 0; i < diff; ++i) {
+        resultCoeffs.push_back(longer[i]);
+    }
+
+    for (std::size_t i = diff; i < longer.size(); ++i) {
+        RationalNumber sum = longer[i].add(shorter[i - diff]);
+        resultCoeffs.push_back(sum);
+    }
+
+    return Polynomial(resultCoeffs);
+}
+
+Polynomial Polynomial::subtract(const Polynomial& other) const {
+    const std::vector<RationalNumber>& longer  = (this->coefficients.size() >= other.coefficients.size())
+        ? this->coefficients
+        : other.coefficients;
+    const std::vector<RationalNumber>& shorter = (this->coefficients.size() >= other.coefficients.size())
+        ? other.coefficients
+        : this->coefficients;
+
+    std::vector<RationalNumber> resultCoeffs;
+    resultCoeffs.reserve(longer.size());
+
+    std::size_t diff = longer.size() - shorter.size();
+
+    bool thisIsLonger = (this->coefficients.size() >= other.coefficients.size());
+
+    for (std::size_t i = 0; i < diff; ++i) {
+        if (thisIsLonger)
+            resultCoeffs.push_back(longer[i]);
+        else
+            resultCoeffs.push_back(RationalNumber(0, 1).subtract(longer[i]));
+    }
+
+    for (std::size_t i = diff; i < longer.size(); ++i) {
+        RationalNumber first_value = thisIsLonger ? longer[i] : RationalNumber(0, 1);
+        RationalNumber second_value = thisIsLonger ? shorter[i - diff] : longer[i - diff];
+        RationalNumber res_value = thisIsLonger ? first_value.subtract(second_value) : second_value.subtract(first_value);
+        resultCoeffs.push_back(res_value);
+    }
+
+    return Polynomial(resultCoeffs);
+}
