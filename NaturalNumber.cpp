@@ -104,12 +104,12 @@ NaturalNumber NaturalNumber::remainder(const NaturalNumber &other) const {
     return dividend.subtract(product);
 }
 
-//N-13: НОД натуральных чисел
+//N13: НОД натуральных чисел
 NaturalNumber NaturalNumber::GCD(const NaturalNumber &other) const {
     NaturalNumber first_value(*this);
     NaturalNumber second_value(other);
 
-    if (!this->isNotEqualZero() && !other.isNotEqualZero()) {
+    if (!this->isNotEqualZero() || !other.isNotEqualZero()) {
         throw UniversalStringException("the gcd for two zeros is not uniquely defined");
     }
 

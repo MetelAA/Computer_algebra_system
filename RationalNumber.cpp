@@ -125,9 +125,9 @@ RationalNumber RationalNumber::add(const RationalNumber &other) const {
     numeratorOther = numeratorOther.multiply(factorOther);
 
     const IntegerNumber sumOfNumerators = IntegerNumber(
-            numeratorThis.getNumbers(), this->getIntegerNumerator().getSign())
+            numeratorThis.getNumbers(), this->getIntegerNumerator().isNegative())
             .add(
-                    IntegerNumber(numeratorOther.getNumbers(), other.getIntegerNumerator().getSign())
+                    IntegerNumber(numeratorOther.getNumbers(), other.getIntegerNumerator().isNegative())
             );
 
     return RationalNumber(sumOfNumerators, commonDenominator);//хороший вопрос может ли здесь возникнуть ситуация с ведущими нулями, но вроде не может, тк ответсвенность за уничтожение ведущих нулей на IntegerNumber::add
@@ -149,9 +149,9 @@ RationalNumber RationalNumber::subtract(const RationalNumber &other) const {
     numeratorOther = numeratorOther.multiply(factorOther);
 
     const IntegerNumber diffOfNumerator = IntegerNumber(
-            numeratorThis.getNumbers(), this->getIntegerNumerator().getSign())
+            numeratorThis.getNumbers(), this->getIntegerNumerator().isNegative())
             .subtract(
-                    IntegerNumber(numeratorOther.getNumbers(), other.getIntegerNumerator().getSign())
+                    IntegerNumber(numeratorOther.getNumbers(), other.getIntegerNumerator().isNegative())
             );
 
     return RationalNumber(diffOfNumerator, commonDenominator);//хороший вопрос может ли здесь возникнуть ситуация с ведущими нулями, но вроде не может, тк ответсвенность за уничтожение ведущих нулей на IntegerNumber::subtract

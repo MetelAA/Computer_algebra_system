@@ -99,7 +99,7 @@ IntegerNumber IntegerNumber::remainder(const IntegerNumber &other) const {
     const IntegerNumber quotient = dividend.quotient(divisor);
     const IntegerNumber product = divisor.multiply(quotient);
 
-    return IntegerNumber(dividend.subtract(product).getNumbers(), this->getSign());;
+    return IntegerNumber(dividend.subtract(product).getNumbers(), this->isNegative());;
 }
 
 //Z1: Абсолютная величина числа, результат - натуральное
@@ -117,6 +117,8 @@ uint8_t IntegerNumber::getSign() const {
 
 //Z3: Умножение целого на (-1)
 IntegerNumber IntegerNumber::negate() const {
+    if (!this->number->isNotEqualZero())
+        return *this;
     return IntegerNumber(this->number->getNumbers(), !this->isNegativeFlag);
 }
 
