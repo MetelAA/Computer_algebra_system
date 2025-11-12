@@ -181,8 +181,6 @@ std::vector<RationalNumber> Validator::validatePolynomial(std::string &number) {
         throw UniversalStringException("Validator::validatePolynomial(): all coefficients are zero!");
     }
 
-    // Реверсируем вектор перед возвратом
-    std::reverse(result.begin(), result.end());
 
     return result;
 }
