@@ -40,7 +40,7 @@ RationalNumber::RationalNumber(const std::string &s) {
     }
 }
 
-// Q-1: сокращение дроби.
+// Q1: сокращение дроби.
 void RationalNumber::reduce() {
     // Беру модуль числителя, чтобы поиск НОД не вызвал проблем.
     // Далее ищу НОД.
@@ -130,7 +130,9 @@ RationalNumber RationalNumber::add(const RationalNumber &other) const {
                     IntegerNumber(numeratorOther.getNumbers(), other.getIntegerNumerator().isNegative())
             );
 
-    return RationalNumber(sumOfNumerators, commonDenominator);//хороший вопрос может ли здесь возникнуть ситуация с ведущими нулями, но вроде не может, тк ответсвенность за уничтожение ведущих нулей на IntegerNumber::add
+    RationalNumber result(sumOfNumerators, commonDenominator);
+    result.reduce();
+    return result;//хороший вопрос может ли здесь возникнуть ситуация с ведущими нулями, но вроде не может, тк ответсвенность за уничтожение ведущих нулей на IntegerNumber::add
 }
 
 //Q6: Вычитание дробей
@@ -154,17 +156,37 @@ RationalNumber RationalNumber::subtract(const RationalNumber &other) const {
                     IntegerNumber(numeratorOther.getNumbers(), other.getIntegerNumerator().isNegative())
             );
 
-    return RationalNumber(diffOfNumerator, commonDenominator);//хороший вопрос может ли здесь возникнуть ситуация с ведущими нулями, но вроде не может, тк ответсвенность за уничтожение ведущих нулей на IntegerNumber::subtract
+    RationalNumber result(diffOfNumerator, commonDenominator);
+    result.reduce();
+    return result;//хороший вопрос может ли здесь возникнуть ситуация с ведущими нулями, но вроде не может, тк ответсвенность за уничтожение ведущих нулей на IntegerNumber::subtract
 }
-
+#include <chrono>
+#include <iostream>
 //Q-7 Умножение рациональных чисел
 RationalNumber RationalNumber::multiply(const RationalNumber& other) const {
     //Пользуемся умножением натуральных и целых чисел
+    auto start = std::chrono::high_resolution_clock::now();
     IntegerNumber intres(this->numerator->multiply(other.getIntegerNumerator()));
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "intres timing:  " << duration.count() << " ms" << std::endl;
+
+    start = std::chrono::high_resolution_clock::now();
     NaturalNumber natres(this->denominator->multiply(other.getNaturalDenominator()));
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "natres timing:  " << duration.count() << " ms" << std::endl;
+
+
+    start = std::chrono::high_resolution_clock::now();
     //Сокращаем полученную дробь
     RationalNumber result(intres, natres);
     result.reduce();
+
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "reduce timing:  " << duration.count() << " ms" << std::endl;
+
     return result;
 }
 
