@@ -147,7 +147,7 @@ IntegerNumber IntegerNumber::remainder(const IntegerNumber &other) const {
     const IntegerNumber quotient = dividend.quotient(divisor);
     const IntegerNumber product = divisor.multiply(quotient);
 
-    return IntegerNumber(dividend.subtract(product).getNumbers(), (this->isNegative() != other.isNegative()));;
+    return IntegerNumber(dividend.subtract(product).getNumbers(), this->isNegative());
 }
 
 //Z1: Абсолютная величина числа, результат - натуральное
