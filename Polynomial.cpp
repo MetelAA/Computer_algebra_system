@@ -30,10 +30,10 @@ std::string Polynomial::toString() const{
             continue;
         }
 
-
-
         if (i != this->coefficients.size()-1){
-            result += " + ";
+            result += " ";
+            result += this->coefficients.at(i).getIntegerNumerator().getSign() == 2 ? "+" : "-";
+            result += " ";
         }
 
         result += coeff;
@@ -193,12 +193,8 @@ Polynomial Polynomial::multiply(const Polynomial &other) const {
     );
 
     // Проверка на нулевой полином (всё коэффициенты = 0)
-    bool thisZero = true;
-    for (const auto &c : this->coefficients)
-        if (c.getIntegerNumerator().abs().isNotEqualZero()) { thisZero = false; break; }
-    bool otherZero = true;
-    for (const auto &c : other.coefficients)
-        if (c.getIntegerNumerator().abs().isNotEqualZero()) { otherZero = false; break; }
+    bool thisZero = this->coefficients.size() == 1 && !this->coefficients.at(0).getIntegerNumerator().abs().isNotEqualZero();
+    bool otherZero = other.coefficients.size() == 1 && !other.coefficients.at(0).getIntegerNumerator().abs().isNotEqualZero();
     if (thisZero || otherZero) return Polynomial({zero});
 
     size_t n = this->coefficients.size();
@@ -206,9 +202,13 @@ Polynomial Polynomial::multiply(const Polynomial &other) const {
 
     // Резервируем результат и инициализируем нулями — один объект RationalNumber на слот
     std::vector<RationalNumber> resultCoeffs;
-    resultCoeffs.assign(n + m - 1, zero);
+    try {
+        resultCoeffs.assign(n + m, zero);
+    }catch (const std::bad_alloc& e) {
+        throw UniversalStringException("Not enough memory to multiply by power of ten");
+    }
 
-    // Классическое O(n*m) умножение, но стараемся минимизировать копии
+    // Классическое O(n*m) умножение
     for (size_t i = 0; i < n; ++i) {
         const RationalNumber &ai = this->coefficients[i];
         // если ai == 0 — пропускаем
@@ -217,87 +217,69 @@ Polynomial Polynomial::multiply(const Polynomial &other) const {
         for (size_t j = 0; j < m; ++j) {
             const RationalNumber &bj = other.coefficients[j];
             if (!bj.getIntegerNumerator().abs().isNotEqualZero()) continue;
-
-            // получаем произведение — предполагается, что multiply() возвращает уже новый RationalNumber
             RationalNumber prod = ai.multiply(bj);
-
-            // добавляем в слот — предполагается, что add() мутирует левый аргумент (как у тебя)
             resultCoeffs[i + j] = resultCoeffs[i + j].add(prod);
-            // не вызываем reduce() здесь!
         }
     }
-
-    // Один проход: сократить дроби в конце — намного реже, чем при каждом add.
-    for (auto &r : resultCoeffs) r.reduce();
 
     return Polynomial(resultCoeffs);
 }
 
 //P9: Частное от деления многочлена на многочлен при делении с остатком
 Polynomial Polynomial::quotient(const Polynomial &other) const {
-    std::vector<RationalNumber> dividendCoefficientVector = coefficients; // делимое
-    std::vector<RationalNumber> divisorCoefficientVector = other.coefficients; // делитель
+    const std::vector<RationalNumber>& divisorCoeffs = other.coefficients;
 
     RationalNumber zero(IntegerNumber(std::vector<uint8_t>{0}, false), NaturalNumber(std::vector<uint8_t>{1}));
 
     // Проверка деления на ноль
-    if (!divisorCoefficientVector.back().getIntegerNumerator().abs().isNotEqualZero()) {
+    if (!divisorCoeffs.back().getIntegerNumerator().abs().isNotEqualZero()) {
         throw UniversalStringException("you cannot divide by zero");
     }
 
-    size_t divisorSize = divisorCoefficientVector.size();
-    size_t dividendSize = dividendCoefficientVector.size();
+    size_t divisorSize = divisorCoeffs.size();
+    size_t dividendSize = coefficients.size();
 
     // Если делимое меньше делителя — частное = 0
     if (dividendSize < divisorSize) {
         return Polynomial({zero});
     }
 
-    // Результат (частное)
-    std::vector<RationalNumber> quotient(dividendSize - divisorSize + 1, zero);
-    // Копия делимого для работы
-    Polynomial remainder(dividendCoefficientVector);
+    // Работаем с копией делимого напрямую (избегаем создания Polynomial)
+    std::vector<RationalNumber> remainder = coefficients;
+    std::vector<RationalNumber> quotientCoeffs(dividendSize - divisorSize + 1, zero);
 
-    RationalNumber divisorLeading = divisorCoefficientVector.back();
+    const RationalNumber& divisorLeading = divisorCoeffs.back();
 
     // Основной цикл деления "в столбик"
-    for (int i = static_cast<int>(dividendSize) - static_cast<int>(divisorSize); i >= 0; --i) {
-        // Если остаток обнулился, выходим
-        if (!remainder.coefficients.back().getIntegerNumerator().abs().isNotEqualZero()) {
-            remainder.coefficients.pop_back();
-            if (remainder.coefficients.size() < divisorSize)
-                break;
+    for (size_t pos = dividendSize; pos >= divisorSize; --pos) {
+        size_t quotientIdx = pos - divisorSize;
+
+        // Проверяем, не нулевой ли старший коэффициент остатка
+        if (!remainder[pos - 1].getIntegerNumerator().abs().isNotEqualZero()) {
+            continue;
         }
 
-        // Вычисляем текущий коэффициент частного
-        RationalNumber coeff = remainder.coefficients.back().division(divisorLeading);
-        quotient[i] = coeff;
+        // Вычисляем коэффициент частного
+        RationalNumber coeff = remainder[pos - 1].division(divisorLeading);
+        quotientCoeffs[quotientIdx] = coeff;
 
-        // Формируем делитель * coeff * x^i
-        std::vector<RationalNumber> shifted(i, zero);
-        for (auto d : divisorCoefficientVector)
-            shifted.push_back(d.multiply(coeff));
-
-        Polynomial toSubtract(shifted);
-        remainder = remainder.subtract(toSubtract);
-
-        // Удаляем ведущие нули в остатке
-        while (remainder.coefficients.size() > 1 &&
-               !remainder.coefficients.back().getIntegerNumerator().abs().isNotEqualZero()) {
-            remainder.coefficients.pop_back();
+        // Вычитаем (делитель * coeff) из остатка IN-PLACE
+        // Избегаем создания временных Polynomial объектов
+        for (size_t j = 0; j < divisorSize; ++j) {
+            RationalNumber product = divisorCoeffs[j].multiply(coeff);
+            remainder[quotientIdx + j] = remainder[quotientIdx + j].subtract(product);
         }
-
-        if (remainder.coefficients.size() < divisorSize)
-            break;
-    }
-    // Удаляем ведущие нули в частном
-    while (quotient.size() > 1 &&
-           !quotient.back().getIntegerNumerator().abs().isNotEqualZero()) {
-        quotient.pop_back();
     }
 
-    return Polynomial(quotient);
+    // Удаляем ведущие нули один раз в конце
+    while (quotientCoeffs.size() > 1 &&
+           !quotientCoeffs.back().getIntegerNumerator().abs().isNotEqualZero()) {
+        quotientCoeffs.pop_back();
+    }
+
+    return Polynomial(quotientCoeffs);
 }
+
 
 //P1: Сложение многочленов
 Polynomial Polynomial::add(const Polynomial &other) const {
@@ -369,6 +351,13 @@ Polynomial Polynomial::multiplyByRational(const RationalNumber &b) const {
 //P-4 умножение полинома на x в k-ой степени
 Polynomial Polynomial::multiplyByXInKPower(std::size_t k) const {
     std::vector<RationalNumber> result;
+
+    try{
+        result.reserve(k+this->coefficients.size());
+    }catch (const std::bad_alloc& e) {
+        throw UniversalStringException("Not enough memory to multiply by power of ten");
+    }
+
     RationalNumber zero(IntegerNumber({0}, false), NaturalNumber(std::vector<uint8_t>{1}));
     //Добавляем в конец полинома количество нулей, равное k
     for (size_t i = 0; i < k; i++) {
