@@ -131,8 +131,7 @@ RationalNumber RationalNumber::add(const RationalNumber &other) const {
             );
 
     RationalNumber result(sumOfNumerators, commonDenominator);
-    //Сокращаем полученную дробь
-    result.reduce();
+
     return result;
 }
 
@@ -158,8 +157,7 @@ RationalNumber RationalNumber::subtract(const RationalNumber &other) const {
             );
 
     RationalNumber result(diffOfNumerator, commonDenominator);
-    //Сокращаем полученную дробь
-    result.reduce();
+
     return result;
 }
 
@@ -168,9 +166,8 @@ RationalNumber RationalNumber::multiply(const RationalNumber& other) const {
     //Пользуемся умножением натуральных и целых чисел
     IntegerNumber intres(this->numerator->multiply(other.getIntegerNumerator()));
     NaturalNumber natres(this->denominator->multiply(other.getNaturalDenominator()));
-    //Сокращаем полученную дробь
     RationalNumber result(intres, natres);
-    result.reduce();
+
     return result;
 }
 
@@ -189,8 +186,8 @@ RationalNumber RationalNumber::division(const RationalNumber& other) const {
     //Так как деление это умножение на обратную дробь, применяем методы умножения
     IntegerNumber intres(this->numerator->multiply(firstmul));
     NaturalNumber natres(this->denominator->multiply(secondmul));
-    //Сокращение дроби
+
     RationalNumber result(intres, natres);
-    result.reduce();
+
     return result;
 }

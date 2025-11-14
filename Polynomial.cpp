@@ -235,68 +235,57 @@ Polynomial Polynomial::multiply(const Polynomial &other) const {
 
 //P9: Частное от деления многочлена на многочлен при делении с остатком
 Polynomial Polynomial::quotient(const Polynomial &other) const {
-    std::vector<RationalNumber> dividendCoefficientVector = coefficients; // делимое
-    std::vector<RationalNumber> divisorCoefficientVector = other.coefficients; // делитель
+    const std::vector<RationalNumber>& divisorCoeffs = other.coefficients;
 
-    RationalNumber zero(IntegerNumber(std::vector<uint8_t>{0}, false), NaturalNumber(std::vector<uint8_t>{1}));
+    RationalNumber zero(IntegerNumber({0}, false), NaturalNumber({1}));
 
     // Проверка деления на ноль
-    if (!divisorCoefficientVector.back().getIntegerNumerator().abs().isNotEqualZero()) {
+    if (!divisorCoeffs.back().getIntegerNumerator().abs().isNotEqualZero()) {
         throw UniversalStringException("you cannot divide by zero");
     }
 
-    size_t divisorSize = divisorCoefficientVector.size();
-    size_t dividendSize = dividendCoefficientVector.size();
+    size_t divisorSize = divisorCoeffs.size();
+    size_t dividendSize = coefficients.size();
 
     // Если делимое меньше делителя — частное = 0
     if (dividendSize < divisorSize) {
         return Polynomial({zero});
     }
 
-    // Результат (частное)
-    std::vector<RationalNumber> quotient(dividendSize - divisorSize + 1, zero);
-    // Копия делимого для работы
-    Polynomial remainder(dividendCoefficientVector);
+    // Работаем с копией делимого напрямую (избегаем создания Polynomial)
+    std::vector<RationalNumber> remainder = coefficients;
+    std::vector<RationalNumber> quotientCoeffs(dividendSize - divisorSize + 1, zero);
 
-    RationalNumber divisorLeading = divisorCoefficientVector.back();
+    const RationalNumber& divisorLeading = divisorCoeffs.back();
 
     // Основной цикл деления "в столбик"
-    for (int i = static_cast<int>(dividendSize) - static_cast<int>(divisorSize); i >= 0; --i) {
-        // Если остаток обнулился, выходим
-        if (!remainder.coefficients.back().getIntegerNumerator().abs().isNotEqualZero()) {
-            remainder.coefficients.pop_back();
-            if (remainder.coefficients.size() < divisorSize)
-                break;
+    for (size_t pos = dividendSize; pos >= divisorSize; --pos) {
+        size_t quotientIdx = pos - divisorSize;
+
+        // Проверяем, не нулевой ли старший коэффициент остатка
+        if (!remainder[pos - 1].getIntegerNumerator().abs().isNotEqualZero()) {
+            continue;
         }
 
-        // Вычисляем текущий коэффициент частного
-        RationalNumber coeff = remainder.coefficients.back().division(divisorLeading);
-        quotient[i] = coeff;
+        // Вычисляем коэффициент частного
+        RationalNumber coeff = remainder[pos - 1].division(divisorLeading);
+        quotientCoeffs[quotientIdx] = coeff;
 
-        // Формируем делитель * coeff * x^i
-        std::vector<RationalNumber> shifted(i, zero);
-        for (auto d : divisorCoefficientVector)
-            shifted.push_back(d.multiply(coeff));
-
-        Polynomial toSubtract(shifted);
-        remainder = remainder.subtract(toSubtract);
-
-        // Удаляем ведущие нули в остатке
-        while (remainder.coefficients.size() > 1 &&
-               !remainder.coefficients.back().getIntegerNumerator().abs().isNotEqualZero()) {
-            remainder.coefficients.pop_back();
+        // Вычитаем (делитель * coeff) из остатка IN-PLACE
+        // Избегаем создания временных Polynomial объектов
+        for (size_t j = 0; j < divisorSize; ++j) {
+            RationalNumber product = divisorCoeffs[j].multiply(coeff);
+            remainder[quotientIdx + j] = remainder[quotientIdx + j].subtract(product);
         }
-
-        if (remainder.coefficients.size() < divisorSize)
-            break;
-    }
-    // Удаляем ведущие нули в частном
-    while (quotient.size() > 1 &&
-           !quotient.back().getIntegerNumerator().abs().isNotEqualZero()) {
-        quotient.pop_back();
     }
 
-    return Polynomial(quotient);
+    // Удаляем ведущие нули один раз в конце
+    while (quotientCoeffs.size() > 1 &&
+           !quotientCoeffs.back().getIntegerNumerator().abs().isNotEqualZero()) {
+        quotientCoeffs.pop_back();
+    }
+
+    return Polynomial(quotientCoeffs);
 }
 
 //P1: Сложение многочленов
