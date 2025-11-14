@@ -265,7 +265,8 @@ NaturalNumber NaturalNumber::multiplyByDigit(std::size_t b) const {
 //  N7: Умножение на 10^k (сдвиг влево на k позиций).
 NaturalNumber NaturalNumber::multiplyByPowerOfTen(std::size_t k) const {
     // Если число равно 0
-    if (this->numbers.size() == 1 && this->numbers[0] == 0)
+
+    if (!this->isNotEqualZero())
         return NaturalNumber(std::vector<uint8_t>{0});
 
     if (this->numbers.size() + k >= SIZE_MAX){
