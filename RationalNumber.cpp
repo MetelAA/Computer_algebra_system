@@ -77,6 +77,8 @@ bool RationalNumber::isInteger() const {
     // Раз оно сокращенное, то знаменатель априори должен быть равен 1.
     // Если он не равен 1, то значит число точняк не целое.
     // (Потому что любое целое - это дробь со знаменателем 1: 56 = 56/1)
+
+    this->reduce();
     const std::vector<uint8_t> &denomDigits = this->denominator->getNumbers();
 
     if (denomDigits.size() == 1) {

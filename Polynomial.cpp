@@ -205,7 +205,7 @@ Polynomial Polynomial::multiply(const Polynomial &other) const {
     // Резервируем результат и инициализируем нулями — один объект RationalNumber на слот
     std::vector<RationalNumber> resultCoeffs;
     try {
-        resultCoeffs.assign(n + m, zero);
+        resultCoeffs.assign(n + m - 1, zero);
     }catch (const std::bad_alloc& e) {
         throw UniversalStringException("Not enough memory to multiply by power of ten");
     }
@@ -286,8 +286,8 @@ Polynomial Polynomial::quotient(const Polynomial &other) const {
 //P1: Сложение многочленов
 Polynomial Polynomial::add(const Polynomial &other) const {
     const std::vector<RationalNumber>& longer = (this->coefficients.size() >= other.coefficients.size())
-                                                 ? this->coefficients
-                                                 : other.coefficients;
+                                                ? this->coefficients
+                                                : other.coefficients;
     const std::vector<RationalNumber>& shorter = (this->coefficients.size() >= other.coefficients.size())
                                                  ? other.coefficients
                                                  : this->coefficients;
